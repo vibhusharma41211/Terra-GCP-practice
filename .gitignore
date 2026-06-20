@@ -1,0 +1,22 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# Variables
+terraform.tfvars
+*.auto.tfvars
+
+# Credentials
+*.json
+*.pem
+*.key
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+crash.log
