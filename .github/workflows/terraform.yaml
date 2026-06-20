@@ -1,0 +1,95 @@
+name: Terraform GCP CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+  pull_request:
+    branches:
+      - main
+      - master
+
+  workflow_dispatch:
+
+jobs:
+  terraform:
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+
+    #######################################################
+    # Checkout Repository
+    #######################################################
+
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    #######################################################
+    # Authenticate to Google Cloud
+    #######################################################
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+
+    #######################################################
+    # Install Google Cloud SDK
+    #######################################################
+
+    - name: Setup Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
+    #######################################################
+    # Setup Terraform
+    #######################################################
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    #######################################################
+    # Terraform Init
+    #######################################################
+
+    - name: Terraform Init
+      run: terraform init
+
+    #######################################################
+    # Terraform Format
+    #######################################################
+
+    - name: Terraform Format Check
+      run: terraform fmt -check
+
+    #######################################################
+    # Terraform Validate
+    #######################################################
+
+    - name: Terraform Validate
+      run: terraform validate
+
+    #######################################################
+    # Terraform Plan
+    #######################################################
+
+    - name: Terraform Plan
+      run: terraform plan
+
+    #######################################################
+    # Terraform Apply
+    #######################################################
+
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      run: terraform apply -auto-approve
